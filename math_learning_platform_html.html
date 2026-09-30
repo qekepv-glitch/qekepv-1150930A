@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>神鬼相消：整數運算互動學習平台</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body {
+    font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+    background: #f5f6fa;
+    color: #2d3436;
+  }
+  nav {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .brand .emoji { font-size: 28px; }
+  .nav-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .nav-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: #555;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .nav-tab:hover { background: #f0f2f5; }
+  .nav-tab.active { background: #dbeafe; color: #1d4ed8; }
+  .score-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: #b8860b;
+    background: #fff8e1;
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 24px;
+  }
+  .card h3 {
+    font-size: 19px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card p.desc { font-size: 16px; line-height: 1.7; margin-bottom: 14px; }
+  .visual-box {
+    background: white;
+    border: 2px dashed #93c5fd;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 14px;
+    text-align: center;
+    font-size: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .visual-box .op { font-size: 26px; font-weight: bold; color: #444; }
+  .visual-box .result { font-size: 22px; font-weight: bold; }
+  .think-box {
+    background: #fffbeb;
+    border-left: 4px solid #fbbf24;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+  .think-box .q { font-weight: 600; margin-bottom: 8px; }
+  details summary {
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .answer-box {
+    margin-top: 10px;
+    background: #ecfdf5;
+    border-left: 4px solid #10b981;
+    border-radius: 6px;
+    padding: 10px 14px;
+  }
+  .answer-box .ans { font-weight: 700; color: #047857; }
+  .answer-box .exp { color: #065f46; margin-top: 4px; font-size: 14px; }
+  .prompt-box {
+    background: #f5f3ff;
+    border-left: 4px solid #a78bfa;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #5b21b6;
+  }
+  .game-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .stat-blue { background: #dbeafe; color: #1e40af; }
+  .stat-purple { background: #ede9fe; color: #5b21b6; }
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  input[type=number] {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    width: 100px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  button.action-btn {
+    background: #22c55e;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  button.action-btn:hover { background: #16a34a; }
+  button.action-btn.red { background: #ef4444; }
+  button.action-btn.red:hover { background: #dc2626; }
+  .feedback {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    border-left: 4px solid;
+  }
+  .feedback.correct { background: #ecfdf5; color: #047857; border-color: #10b981; }
+  .feedback.wrong { background: #fef2f2; color: #b91c1c; border-color: #ef4444; }
+  .assess-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .assess-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .type-tag {
+    background: #f3f4f6;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #555;
+  }
+  .assess-q { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .multi-rep {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 16px;
+  }
+  .multi-rep h4 { margin-bottom: 8px; color: #1e3a8a; }
+  .multi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 14px;
+    color: #1e40af;
+  }
+  .qtech-item {
+    border-left: 4px solid;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .qtech-item h4 { margin-bottom: 6px; }
+  .qtech-red { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
+  .qtech-yellow { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+  .qtech-blue { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+  .qtech-green { background: #ecfdf5; border-color: #10b981; color: #065f46; }
+  .qtech-pink { background: #fdf2f8; border-color: #ec4899; color: #9d174d; }
+  .qtech-purple { background: #f5f3ff; border-color: #8b5cf6; color: #5b21b6; }
+  .summary-bar {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#fef3c7,#fde68a);
+    text-align: center;
+    font-weight: 700;
+    color: #78350f;
+  }
+  @media (max-width: 640px) {
+    .nav-tab span.label { display:none; }
+    .visual-box { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span class="emoji">👼👹</span> 神鬼相消數學平台</div>
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" data-section="concept">📖 <span class="label">概念學習</span></button>
+      <button class="nav-tab" data-section="game">🎮 <span class="label">互動遊戲</span></button>
+      <button class="nav-tab" data-section="assessment">🎯 <span class="label">學習評量</span></button>
+      <button class="nav-tab" data-section="questioning">💬 <span class="label">提問技巧</span></button>
+    </div>
+    <div class="score-badge">🏆 <span id="scoreDisplay">0</span> 分</div>
+  </div>
+</nav>
+
+<main id="mainContent"></main>
+
+<script>
+const state = { score: 0, gameScore: 0, section: 'concept' };
+
+const conceptStages = [
+  {
+    title: "天使與惡魔的對戰規則",
+    content: "在數學的世界裡，正數就像天使👼，負數就像惡魔👹。當天使和惡魔相遇時會互相抵消！",
+    visualHtml: `<span>👼👼👼</span><span class="op">VS</span><span>👹👹👹</span><span class="op">=</span><span class="result">💫 全部抵消</span>`,
+    question: "如果有3個天使和3個惡魔相遇，最後剩下什麼？",
+    answer: "0（全部抵消）",
+    explanation: "3個正數和3個負數相加等於0，這就是「相消」的概念！"
+  },
+  {
+    title: "正數加法：天使軍團集結",
+    content: "當同類型的天使聚在一起，力量會增強！正數加正數，結果更大。",
+    visualHtml: `<span>👼×7</span><span class="op">+</span><span>👼×5</span><span class="op">=</span><span class="result">✨ 12個天使兵</span>`,
+    question: "7個天使兵 + 5個天使兵 = ?",
+    answer: "12個天使兵",
+    explanation: "同號數相加，絕對值相加，符號不變：(+7) + (+5) = +12"
+  },
+  {
+    title: "負數加法：惡魔軍團壯大",
+    content: "惡魔們聚集時，負面力量會累積！負數加負數，結果更小。",
+    visualHtml: `<span>👹×9</span><span class="op">+</span><span>👹×15</span><span class="op">=</span><span class="result" style="color:#dc2626">-24</span>`,
+    question: "(-9) + (-15) = ?",
+    answer: "-24",
+    explanation: "同號數相加，絕對值相加，符號不變：|-9| + |-15| = 24，結果為-24"
+  }
+];
+
+const questioningTechniques = [
+  { type:'extreme', name:'極端反差提問', icon:'⚡', color:'red', q:'如果有1000個天使對抗1001個惡魔，你覺得天使能獲勝嗎？為什麼？' },
+  { type:'critical', name:'臨界點提問', icon:'⚖️', color:'yellow', q:'(-5) + 5 = 0，那麼 (-5) - (-5) 也等於 0 嗎？' },
+  { type:'network', name:'網絡式提問', icon:'🕸️', color:'blue', q:'你能用天使惡魔的概念解釋為什麼 a - b = a + (-b) 嗎？' },
+  { type:'quantitative', name:'知數能學提問', icon:'🔢', color:'green', q:'觀察這些算式：3+(-5), 7+(-2), 10+(-8)，你發現什麼規律？' },
+  { type:'emotional', name:'情緒分享提問', icon:'💫', color:'pink', q:'當你看到負數時會害怕嗎？讓我們一起征服這些數學惡魔！' },
+  { type:'linguistic', name:'語言演化提問', icon:'🗣️', color:'purple', q:'『減去一個負數』在日常生活中可以怎麼理解？' }
+];
+
+const gameQuestions = [
+  {
+    description: "天使與惡魔大戰開始！",
+    visualHtml: `<span>👼×7</span><span class="op" style="font-size:22px">VS</span><span>👹×12</span>`,
+    question: "7個天使兵 + 12個惡魔兵，戰場上剩下什麼？",
+    answer: -5,
+    explanation: "天使和惡魔會互相抵消，7個天使抵消7個惡魔，剩下5個惡魔"
+  },
+  {
+    description: "增援部隊到達！",
+    visualHtml: `<span style="color:#dc2626">-15</span><span class="op">+</span><span>👼×7</span>`,
+    question: "(-15) 增加 7個天使兵 = ?",
+    answer: -8,
+    explanation: "增加天使兵就是加正數：(-15) + 7 = -8"
+  },
+  {
+    description: "複雜戰況分析",
+    visualHtml: `<span style="font-size:28px">(-17) - 8 = ?</span>`,
+    question: "(-17) - 8 = ?",
+    answer: -25,
+    explanation: "減去正數等於加上負數：(-17) - 8 = (-17) + (-8) = -25"
+  }
+];
+
+const assessmentQuestions = [
+  { question: "7個天使兵 + 12個惡魔兵 = ?", answer: -5, type: "基礎題" },
+  { question: "(-12) + 7 = ?", answer: -5, type: "混合題" },
+  { question: "18 - (-6) = ?", answer: 24, type: "減法題" },
+  { question: "(-17) + (-27) = ?", answer: -44, type: "負數題" },
+  { question: "25 - (-16) = ?", answer: 41, type: "綜合題" }
+];
+
+function updateScoreDisplay(){
+  document.getElementById('scoreDisplay').textContent = state.score;
+}
+
+function renderConcept(){
+  let html = `<div class="section-title">📖 概念學習：天使惡魔數學王國</div>`;
+  conceptStages.forEach((s, i) => {
+    const tech = questioningTechniques[i % questioningTechniques.length];
+    html += `
+    <div class="card">
+      <h3>⭐ ${s.title}</h3>
+      <p class="desc">${s.content}</p>
+      <div class="visual-box">${s.visualHtml}</div>
+      <div class="think-box">
+        <div class="q">🤔 思考挑戰：${s.question}</div>
+        <details>
+          <summary>點擊查看答案</summary>
+          <div class="answer-box">
+            <div class="ans">答案：${s.answer}</div>
+            <div class="exp">${s.explanation}</div>
+          </div>
+        </details>
+      </div>
+      <div class="prompt-box">💡 <strong>深度提問：</strong>${tech.q}</div>
+    </div>`;
+  });
+  return html;
+}
+
+function renderGame(){
+  let html = `
+  <div class="game-header">
+    <div class="section-title" style="margin-bottom:0">🎮 互動遊戲：數學戰場</div>
+    <div style="margin-left:auto; display:flex; gap:10px;">
+      <div class="stat-pill stat-blue">得分: <span id="gameScoreDisplay">${state.gameScore}</span></div>
+      <div class="stat-pill stat-purple">關卡: 1</div>
+    </div>
+  </div>`;
+  gameQuestions.forEach((g, i) => {
+    html += `
+    <div class="card" style="background:linear-gradient(135deg,#ecfdf5,#eff6ff); border-color:#bbf7d0;">
+      <h3>🎮 ${g.description}</h3>
+      <div class="visual-box">${g.visualHtml}</div>
+      <div class="think-box">
+        <div class="q">${g.question}</div>
+        <div class="input-row">
+          <input type="number" id="game-input-${i}" placeholder="答案">
+          <button class="action-btn" onclick="checkGameAnswer(${i})">✅ 確認</button>
+        </div>
+      </div>
+      <div id="game-feedback-${i}"></div>
+    </div>`;
+  });
+  return html;
+}
+
+function checkGameAnswer(i){
+  const input = document.getElementById(`game-input-${i}`);
+  const feedbackDiv = document.getElementById(`game-feedback-${i}`);
+  const val = parseInt(input.value);
+  const g = gameQuestions[i];
+  const correct = val === g.answer;
+  if(correct){
+    state.score += 10;
+    state.gameScore += 1;
+    updateScoreDisplay();
+    document.getElementById('gameScoreDisplay').textContent = state.gameScore;
+  }
+  feedbackDiv.innerHTML = `<div class="feedback ${correct?'correct':'wrong'}">
+    ${correct ? '✅ 答對了！🎉 ' : '❌ 再想想看！💭 '} ${g.explanation}
+  </div>`;
+}
+
+function renderAssessment(){
+  let html = `<div class="section-title">🎯 學習評量：終極挑戰</div>
+  <div class="card" style="background:linear-gradient(135deg,#fef2f2,#fff7ed); border-color:#fecaca;">
+    <h3>📝 Assessment For Learning 即時評量</h3>`;
+  assessmentQuestions.forEach((q, i) => {
+    html += `
+    <div class="assess-item">
+      <div class="assess-top">
+        <span style="font-weight:700;">第 ${i+1} 題</span>
+        <span class="type-tag">類型: ${q.type}</span>
+      </div>
+      <div class="assess-q">${q.question}</div>
+      <div class="input-row">
+        <input type="number" id="assess-input-${i}" placeholder="答案">
+        <button class="action-btn red" onclick="checkAssessAnswer(${i})">📤 提交</button>
+      </div>
+      <div id="assess-feedback-${i}"></div>
+    </div>`;
+  });
+  html += `
+    <div class="multi-rep">
+      <h4>📊 多元表徵評量</h4>
+      <div class="multi-grid">
+        <div>• 圖像表徵：天使惡魔視覺化</div>
+        <div>• 符號表徵：數學算式</div>
+        <div>• 語言表徵：口語說明</div>
+        <div>• 情境表徵：生活應用</div>
+      </div>
+    </div>
+    <div class="summary-bar">目前總分：<span id="assessScoreLine">${state.score}</span> 分，繼續加油！💪</div>
+  </div>`;
+  return html;
+}
+
+function checkAssessAnswer(i){
+  const input = document.getElementById(`assess-input-${i}`);
+  const feedbackDiv = document.getElementById(`assess-feedback-${i}`);
+  const val = parseInt(input.value);
+  const q = assessmentQuestions[i];
+  const correct = val === q.answer;
+  if(correct){
+    state.score += 15;
+    updateScoreDisplay();
+    const line = document.getElementById('assessScoreLine');
+    if(line) line.textContent = state.score;
+  }
+  feedbackDiv.innerHTML = `<div class="feedback ${correct?'correct':'wrong'}" style="margin-top:10px;">
+    ${correct ? '✅ 答對了！標準答案為 ' + q.answer : '❌ 正確答案是 ' + q.answer + '，再檢查一次計算過程喔！'}
+  </div>`;
+}
+
+function renderQuestioning(){
+  let html = `<div class="section-title">💬 數學提問技巧</div>`;
+  questioningTechniques.forEach(t => {
+    html += `
+    <div class="qtech-item qtech-${t.color}">
+      <h4>${t.icon} ${t.name}</h4>
+      <p>${t.q}</p>
+    </div>`;
+  });
+  return html;
+}
+
+function render(){
+  const main = document.getElementById('mainContent');
+  if(state.section === 'concept') main.innerHTML = renderConcept();
+  else if(state.section === 'game') main.innerHTML = renderGame();
+  else if(state.section === 'assessment') main.innerHTML = renderAssessment();
+  else if(state.section === 'questioning') main.innerHTML = renderQuestioning();
+
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.section === state.section);
+  });
+}
+
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    state.section = tab.dataset.section;
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
